@@ -1,0 +1,6 @@
+{
+    width: 500,
+    height: 500,
+    elements: 10,
+    padding: 50
+}
