@@ -1,12 +1,16 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var d3 = require('d3');
 var params = require('./params.json');
-//var poissonDiscSampler = require('./js/poissonDiscSampler.js');
+var poisson = require('./js/poissonDiscSampler.js');
+
+var x = d3.scale.linear()
+    .domain([0, params.width])
+    .range([-params.width/2, params.width/2]);
 
 var svg = d3.select('body')
             .append('svg')
             .attr('width', params.width)
-            .attr('height', params.height);
+            .attr('height', params.width);
 
 //Background
 svg.append('rect')
@@ -14,100 +18,142 @@ svg.append('rect')
     .attr('width', '100%')
     .attr('height', '100%');
 
-var sample = poissonDiscSampler(params.width, params.height, 24.69);
+//Group
+var g = svg.append('g')
+        .attr('transform', 'translate(' + params.width/2 + ',' + params.width/2 + ')');
 
-d3.timer(function() {
+var sample = poisson(params.width, params.width, params.eDistance),
+    format = d3.format('.4f'),
+    points = [],
+    fibrils,
+    circles;
 
-    for (var i = 0; i < 10; ++i) {
-        var s = sample();
-        if (!s) return true;
-     
-         svg.append('circle')
-            .attr('cx', s[0])
-            .attr('cy', s[1])
-            .attr('r', 0)
-            //.attr('stroke', '#ecf0f1')
-            .attr('stroke-width', 1)
-            .attr('fill', '#e74c3c')
-            .transition()
-                .attr('r', 8.55);
-        
+while(true){
+    var s = sample();
+    if (!s) break;
+    points.push(s);
+}
+
+fibrils = points.map(function(p){
+    return {
+        x:p[0],
+        y:p[1]
     }
 });
 
-// Based on https://www.jasondavies.com/poisson-disc/
-function poissonDiscSampler(width, height, radius) {
-  var k = 30, // maximum number of samples before rejection
-      radius2 = radius * radius,
-      R = 3 * radius2,
-      cellSize = radius * Math.SQRT1_2,
-      gridWidth = Math.ceil(width / cellSize),
-      gridHeight = Math.ceil(height / cellSize),
-      grid = new Array(gridWidth * gridHeight),
-      queue = [],
-      queueSize = 0,
-      sampleSize = 0;
+circles = g.selectAll('circle')
+    .data(fibrils)
+    .enter()
+    .append('circle')
+    .attr('cx', function(d){ return x(d.x);})
+    .attr('cy', function(d){ return x(d.y);})
+    .attr('r', getRadius(0))
+    .attr('fill', '#e74c3c');
 
-  return function() {
-    if (!sampleSize) return sample(Math.random() * width, Math.random() * height);
-
-    // Pick a random existing sample and remove it from the queue.
-    while (queueSize) {
-      var i = Math.random() * queueSize | 0,
-          s = queue[i];
-
-      // Make a new candidate between [radius, 2 * radius] from the existing sample.
-      for (var j = 0; j < k; ++j) {
-        var a = 2 * Math.PI * Math.random(),
-            r = Math.sqrt(Math.random() * R + radius2),
-            x = s[0] + r * Math.cos(a),
-            y = s[1] + r * Math.sin(a);
-
-        // Reject candidates that are outside the allowed extent,
-        // or closer than 2 * radius to any existing sample.
-        if (0 <= x && x < width && 0 <= y && y < height && far(x, y)) return sample(x, y);
-      }
-
-      queue[i] = queue[--queueSize];
-      queue.length = queueSize;
-    }
-  };
-
-  function far(x, y) {
-    var i = x / cellSize | 0,
-        j = y / cellSize | 0,
-        i0 = Math.max(i - 2, 0),
-        j0 = Math.max(j - 2, 0),
-        i1 = Math.min(i + 3, gridWidth),
-        j1 = Math.min(j + 3, gridHeight);
-
-    for (j = j0; j < j1; ++j) {
-      var o = j * gridWidth;
-      for (i = i0; i < i1; ++i) {
-        if (s = grid[o + i]) {
-          var s,
-              dx = s[0] - x,
-              dy = s[1] - y;
-          if (dx * dx + dy * dy < radius2) return false;
-        }
-      }
-    }
-
-    return true;
-  }
-
-  function sample(x, y) {
-    var s = [x, y];
-    queue.push(s);
-    grid[gridWidth * (y / cellSize | 0) + (x / cellSize | 0)] = s;
-    ++sampleSize;
-    ++queueSize;
-    return s;
-  }
+function getRadius(i){
+    return params.growthRates[i] * params.width;
 }
 
+var i = 1,
+    tr = circles
+        .transition()
+        .duration(params.transition);
+        
 
-},{"./params.json":3,"d3":2}],2:[function(require,module,exports){
+while(i < params.growthRates.length){
+    
+    var r = getRadius(i);
+    
+    tr.attr('r', r)
+        /*.attr('cx', function(d){
+            var x = +this.getAttribute('cx');
+            return  x + ( x * params.growthRates[i] );          
+        })
+        .attr('cy', function(d){
+            var y = +this.getAttribute('cy');
+            return  y + ( y * params.growthRates[i] );          
+        });*/
+        
+    i++;
+}
+},{"./js/poissonDiscSampler.js":2,"./params.json":4,"d3":3}],2:[function(require,module,exports){
+// Based on https://www.jasondavies.com/poisson-disc/
+function poissonDiscSample(width, height, radius){
+    
+    
+    var k = 30, // maximum number of samples before rejection
+        radius2 = radius * radius,
+        R = 3 * radius2,
+        cellSize = radius * Math.SQRT1_2,
+        gridWidth = Math.ceil(width / cellSize),
+        gridHeight = Math.ceil(height / cellSize),
+        grid = new Array(gridWidth * gridHeight),
+        queue = [],
+        queueSize = 0,
+        sampleSize = 0;
+    
+    return function(){
+        if (!sampleSize) return sample(Math.random() * width, Math.random() * height);
+
+        // Pick a random existing sample and remove it from the queue.
+        while (queueSize) {
+            var i = Math.random() * queueSize | 0,
+                s = queue[i];
+
+            // Make a new candidate between [radius, 2 * radius] from the existing sample.
+            for (var j = 0; j < k; ++j) {
+                var a = 2 * Math.PI * Math.random(),
+                    r = Math.sqrt(Math.random() * R + radius2),
+                    x = s[0] + r * Math.cos(a),
+                    y = s[1] + r * Math.sin(a);
+
+                // Reject candidates that are outside the allowed extent,
+                // or closer than 2 * radius to any existing sample.
+                if (0 <= x && x < width && 0 <= y && y < height && far(x, y)) return sample(x, y);
+            }
+            
+            queue[i] = queue[--queueSize];
+            queue.length = queueSize;
+        }
+    };
+    
+    function far(x, y) {
+        var i = x / cellSize | 0,
+            j = y / cellSize | 0,
+            i0 = Math.max(i - 2, 0),
+            j0 = Math.max(j - 2, 0),
+            i1 = Math.min(i + 3, gridWidth),
+            j1 = Math.min(j + 3, gridHeight), 
+            s;
+
+        for (j = j0; j < j1; ++j) {
+            var o = j * gridWidth;
+            for (i = i0; i < i1; ++i) {
+
+                s = grid[o + i]; 
+                if(s) {
+                    var dx = s[0] - x,
+                        dy = s[1] - y;
+                    if (dx * dx + dy * dy < radius2) return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    function sample(x, y) {
+        var s = [x, y];
+        queue.push(s);
+        grid[gridWidth * (y / cellSize | 0) + (x / cellSize | 0)] = s;
+        ++sampleSize;
+        ++queueSize;
+        return s;
+    }
+}
+
+module.exports = poissonDiscSample;
+
+},{}],3:[function(require,module,exports){
 !function() {
   var d3 = {
     version: "3.5.17"
@@ -9662,11 +9708,11 @@ function poissonDiscSampler(width, height, radius) {
   });
   if (typeof define === "function" && define.amd) this.d3 = d3, define(d3); else if (typeof module === "object" && module.exports) module.exports = d3; else this.d3 = d3;
 }();
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 module.exports={
     width: 500,
-    height: 500,
-    elements: 10,
-    padding: 50
+    eDistance: 36.6,
+    growthRates: [0.014642212,  0.01623998,  0.020392773,  0.033045919,  0.035108602,  0.037108184,  0.050580414],
+    transition: 6000
 }
 },{}]},{},[1]);
