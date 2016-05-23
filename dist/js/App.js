@@ -7,6 +7,10 @@ var x = d3.scale.linear()
     .domain([0, params.width])
     .range([-params.width/2, params.width/2]);
 
+var scale = d3.scale.linear()
+    .domain([0, params.window])
+    .range([0, params.width]);
+
 var svg = d3.select('body')
             .append('svg')
             .attr('width', params.width)
@@ -51,31 +55,63 @@ circles = g.selectAll('circle')
     .attr('fill', '#e74c3c');
 
 function getRadius(i){
-    return params.growthRates[i] * params.width;
+    return scale(params.timepoints[i].d);
 }
 
 var i = 1,
+    x1 = params.width,
     tr = circles
         .transition()
         .duration(params.transition);
         
 
-while(i < params.growthRates.length){
+while(i < params.timepoints.length){
     
     var r = getRadius(i);
+    x1 += circles.length * r * 10;
     
     tr.attr('r', r)
-        /*.attr('cx', function(d){
+        .attr('cx', function(d){
+        
             var x = +this.getAttribute('cx');
-            return  x + ( x * params.growthRates[i] );          
+            
+            console.log(x, x * (x1/params.width));
+        
+            return  x * (x1/params.width);          
         })
         .attr('cy', function(d){
+            
             var y = +this.getAttribute('cy');
-            return  y + ( y * params.growthRates[i] );          
-        });*/
         
+            return  y * (x1/params.width);    
+        });
+    
     i++;
 }
+
+
+/*
+
+.attr('cx', function(d){
+        
+            var x = +this.getAttribute('cx'),
+                y = +this.getAttribute('cy'),
+                h = Math.sqrt( Math.pow(x,2) + Math.pow(y, 2) ),
+                cos = x/h;
+        
+            return  x + cos * r;          
+        })
+        .attr('cy', function(d){
+            
+            var x = +this.getAttribute('cx'),
+                y = +this.getAttribute('cy'),
+                h = Math.sqrt( Math.pow(x,2) + Math.pow(y, 2) ),
+                sin = y/h;
+        
+            return  y + sin * r;    
+        });
+
+*/
 },{"./js/poissonDiscSampler.js":2,"./params.json":4,"d3":3}],2:[function(require,module,exports){
 // Based on https://www.jasondavies.com/poisson-disc/
 function poissonDiscSample(width, height, radius){
@@ -9711,8 +9747,47 @@ module.exports = poissonDiscSample;
 },{}],4:[function(require,module,exports){
 module.exports={
     width: 500,
+    window: 28.33974241,
     eDistance: 36.6,
-    growthRates: [0.014642212,  0.01623998,  0.020392773,  0.033045919,  0.035108602,  0.037108184,  0.050580414],
-    transition: 6000
+    transition: 18000,
+    timepoints:[
+        
+        {
+            name : '30h_full_avg',
+            d: 0.414956522,
+            dev: 0.02957345
+        },
+        {
+            name : '48h_full_avg',
+            d: 0.460236842,
+            dev: 0.023685363
+        },
+        {
+            name : '60h_full_avg',
+            d: 0.577925926,
+            dev: 0.065053189
+        },
+        {
+            name : '72h_full_avg',
+            d: 0.936512821,
+            dev: 0.08255361
+        },
+        {
+            name : '80h_full_avg',
+            d: 0.99496875,
+            dev: 0.073868446
+        },
+        {
+            name : '90h_full_avg',
+            d: 1.051636364,
+            dev: 0.074312608
+        },
+        {
+            name : '1d_full_avg',
+            d: 1.433435897,
+            dev: 0.095675107
+        }
+
+    ]
 }
 },{}]},{},[1]);

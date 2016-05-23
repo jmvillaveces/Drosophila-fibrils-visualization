@@ -6,6 +6,10 @@ var x = d3.scale.linear()
     .domain([0, params.width])
     .range([-params.width/2, params.width/2]);
 
+var scale = d3.scale.linear()
+    .domain([0, params.window])
+    .range([0, params.width]);
+
 var svg = d3.select('body')
             .append('svg')
             .attr('width', params.width)
@@ -50,28 +54,36 @@ circles = g.selectAll('circle')
     .attr('fill', '#e74c3c');
 
 function getRadius(i){
-    return params.growthRates[i] * params.width;
+    return scale(params.timepoints[i].d);
 }
 
 var i = 1,
+    x1 = params.width,
     tr = circles
         .transition()
         .duration(params.transition);
         
 
-while(i < params.growthRates.length){
+while(i < params.timepoints.length){
     
     var r = getRadius(i);
+    x1 += circles.length * r * 10;
     
     tr.attr('r', r)
-        /*.attr('cx', function(d){
+        .attr('cx', function(d){
+        
             var x = +this.getAttribute('cx');
-            return  x + ( x * params.growthRates[i] );          
+            
+            console.log(x, x * (x1/params.width));
+        
+            return  x * (x1/params.width);          
         })
         .attr('cy', function(d){
+            
             var y = +this.getAttribute('cy');
-            return  y + ( y * params.growthRates[i] );          
-        });*/
         
+            return  y * (x1/params.width);    
+        });
+    
     i++;
 }
