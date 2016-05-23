@@ -11,6 +11,10 @@ var scale = d3.scale.linear()
     .domain([0, params.window])
     .range([0, params.width]);
 
+var timeScale = d3.scale.linear()
+    .domain([ 0, d3.sum(params.timepoints, function(d){ return d.time; }) ])
+    .range([ 0, params.transition ]);
+
 var svg = d3.select('body')
             .append('svg')
             .attr('width', params.width)
@@ -51,67 +55,97 @@ circles = g.selectAll('circle')
     .append('circle')
     .attr('cx', function(d){ return x(d.x);})
     .attr('cy', function(d){ return x(d.y);})
-    .attr('r', getRadius(0))
+    .attr('r', scale(params.timepoints[0].d/2))
     .attr('fill', '#e74c3c');
 
-function getRadius(i){
-    return scale(params.timepoints[i].d);
+function endall(transition, callback) { 
+    var n = 0; 
+    transition
+        .each(function() { ++n; }) 
+        .each('end', function() { if (!--n) callback.apply(this, arguments); });
 }
 
-var i = 1,
+function getDeltaTime(i){
+   return (i > 0) ? params.timepoints[i].time - params.timepoints[i-1].time : params.timepoints[i].time; 
+}
+
+function getDelay(i){
+   return (i > 0) ? getDeltaTime(i)  : 0; 
+}
+
+var i = 0,
+    x1 = params.width,
+    delay = 0;
+
+function transition(){
+    
+    if( i >= params.timepoints.length) return;
+    
+    var e = params.timepoints[i],
+        r = scale(e.d/2);
+        x1 += Math.sqrt(circles.size()) * r,
+        t =  timeScale(getDeltaTime(i));
+    
+    console.log(t);
+    
+    var d = Date.now();
+    
+    circles
+        .transition()
+        .duration(t)
+        .attr('r',  r)
+        /*.attr('cx', function(d){
+        
+            var x = +this.getAttribute('cx');
+            return  x * (x1/params.width);
+        })
+        .attr('cy', function(d){
+            
+            var y = +this.getAttribute('cy');
+            return  y * (x1/params.width);
+        })*/
+        .each('end', transition);
+    
+    delay = t;
+    //console.log(Date.now() - d, timeScale(t));
+    
+    i++;
+}
+
+transition(i);
+
+/*var i = 1,
     x1 = params.width,
     tr = circles
         .transition()
         .duration(params.transition);
+*/
         
 
-while(i < params.timepoints.length){
+
+
+
+/*while(i < params.timepoints.length){
     
     var r = getRadius(i);
-    x1 += circles.length * r * 10;
+    x1 += Math.sqrt(circles.size()) * r;
     
-    tr.attr('r', r)
+    tr.attr('r', r);
         .attr('cx', function(d){
         
             var x = +this.getAttribute('cx');
-            
-            console.log(x, x * (x1/params.width));
         
-            return  x * (x1/params.width);          
+            return  x * (x1/params.width);
         })
         .attr('cy', function(d){
             
             var y = +this.getAttribute('cy');
         
-            return  y * (x1/params.width);    
+            return  y * (x1/params.width);
         });
     
     i++;
-}
-
-
-/*
-
-.attr('cx', function(d){
-        
-            var x = +this.getAttribute('cx'),
-                y = +this.getAttribute('cy'),
-                h = Math.sqrt( Math.pow(x,2) + Math.pow(y, 2) ),
-                cos = x/h;
-        
-            return  x + cos * r;          
-        })
-        .attr('cy', function(d){
-            
-            var x = +this.getAttribute('cx'),
-                y = +this.getAttribute('cy'),
-                h = Math.sqrt( Math.pow(x,2) + Math.pow(y, 2) ),
-                sin = y/h;
-        
-            return  y + sin * r;    
-        });
-
-*/
+}*/
 },{"./js/poissonDiscSampler.js":2,"./params.json":4,"d3":3}],2:[function(require,module,exports){
 // Based on https://www.jasondavies.com/poisson-disc/
 function poissonDiscSample(width, height, radius){
@@ -9749,43 +9783,50 @@ module.exports={
     width: 500,
     window: 28.33974241,
     eDistance: 36.6,
-    transition: 18000,
+    transition: 12000,
     timepoints:[
         
         {
             name : '30h_full_avg',
             d: 0.414956522,
-            dev: 0.02957345
+            dev: 0.02957345,
+            time: 30
         },
         {
             name : '48h_full_avg',
             d: 0.460236842,
-            dev: 0.023685363
+            dev: 0.023685363,
+            time: 48
         },
         {
             name : '60h_full_avg',
             d: 0.577925926,
-            dev: 0.065053189
+            dev: 0.065053189,
+            time: 60
         },
         {
             name : '72h_full_avg',
             d: 0.936512821,
-            dev: 0.08255361
+            dev: 0.08255361,
+            time: 72
         },
         {
             name : '80h_full_avg',
             d: 0.99496875,
-            dev: 0.073868446
+            dev: 0.073868446,
+            time: 80
         },
         {
             name : '90h_full_avg',
             d: 1.051636364,
-            dev: 0.074312608
+            dev: 0.074312608,
+            time: 90
         },
         {
             name : '1d_full_avg',
             d: 1.433435897,
-            dev: 0.095675107
+            dev: 0.095675107,
+            time: 114
         }
 
     ]
