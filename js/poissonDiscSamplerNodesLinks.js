@@ -1,8 +1,11 @@
-var links = [], 
-    nodes = [];
+var links, 
+    nodes;
 
 function init(width, height, radius){
 
+    links = [];
+    nodes = [];
+    
     var sample = poissonDiscSampler(width, height, radius);
     
     while(true){

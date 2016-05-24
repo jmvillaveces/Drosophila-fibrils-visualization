@@ -1,7 +1,7 @@
 var d3 = require('d3');
 var _ = require('underscore');
 var params = require('./params.json');
-var poisson = require('./js/poissonDiscSamplerNodesLinks.js');
+var poisson = require('../js/poissonDiscSamplerNodesLinks.js');
 
 var force = null,
     nodes = null,
@@ -44,7 +44,7 @@ function getChargefunction(d){
 }
 
 function initForce() {
-    
+
     var data = poisson(params.width, params.width, params.eDistance);
     
     force = d3.layout.force()
