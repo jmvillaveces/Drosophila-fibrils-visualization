@@ -19,6 +19,8 @@
   "devDependencies": {
     "d3": "^3.5.17",
     "grunt": "^1.0.1",
-    "grunt-cli": "^1.2.0"
+    "grunt-cli": "^1.2.0",
+    "json2csv": "^3.4.2",
+    "underscore": "^1.8.3"
   }
 }
