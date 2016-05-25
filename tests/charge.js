@@ -14,13 +14,13 @@ var scale = d3.scale.linear()
     .range([0, params.width]);
 
 var stats = [],
-    fields = ['charge', 'l0', 'l1'];;
+    fields = ['charge', 'l0', 'l1'];
 
 
-var i = -30;
-while(i <= 30){
+var i = -50;
+while(i <= 0){
     simulate(i);
-    i += 2;
+    i += 1;
 }
 
 

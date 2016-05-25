@@ -1,51 +1,51 @@
 {
-    width: 500,
-    window: 28.33974241,
-    eDistance: 0.589173913,
-    transition: 12000,
-    timepoints:[
+    "width": 500,
+    "window": 28.33974241,
+    "eDistance": 36,
+    "transition": 200000,
+    "timepoints":[
         
         {
-            name : '30h_full_avg',
-            d: 0.414956522,
-            dev: 0.02957345,
-            time: 30
+            "name" : "30h_full_avg",
+            "d": 0.414956522,
+            "dev": 0.02957345,
+            "time": 30
         },
         {
-            name : '48h_full_avg',
-            d: 0.460236842,
-            dev: 0.023685363,
-            time: 48
+            "name" : "48h_full_avg",
+            "d": 0.460236842,
+            "dev": 0.023685363,
+            "time": 48
         },
         {
-            name : '60h_full_avg',
-            d: 0.577925926,
-            dev: 0.065053189,
-            time: 60
+            "name" : "60h_full_avg",
+            "d": 0.577925926,
+            "dev": 0.065053189,
+            "time": 60
         },
         {
-            name : '72h_full_avg',
-            d: 0.936512821,
-            dev: 0.08255361,
-            time: 72
+            "name" : "72h_full_avg",
+            "d": 0.936512821,
+            "dev": 0.08255361,
+            "time": 72
         },
         {
-            name : '80h_full_avg',
-            d: 0.99496875,
-            dev: 0.073868446,
-            time: 80
+            "name" : "80h_full_avg",
+            "d": 0.99496875,
+            "dev": 0.073868446,
+            "time": 80
         },
         {
-            name : '90h_full_avg',
-            d: 1.051636364,
-            dev: 0.074312608,
-            time: 90
+            "name" : "90h_full_avg",
+            "d": 1.051636364,
+            "dev": 0.074312608,
+            "time": 90
         },
         {
-            name : '1d_full_avg',
-            d: 1.433435897,
-            dev: 0.095675107,
-            time: 114
+            "name" : "1d_full_avg",
+            "d": 1.433435897,
+            "dev": 0.095675107,
+            "time": 114
         }
 
     ]
