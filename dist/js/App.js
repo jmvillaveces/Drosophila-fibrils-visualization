@@ -2,7 +2,7 @@
 var d3 = require('d3'),
     _ = require('underscore'),
     params = require('./params.json'),
-    poisson = require('./js/poissonDiscSamplerNodesLinks.js');
+    poisson = require('./js/algorithms/poissonDiscSamplerNodesLinks.js');
 
 var animationStep = 400;
 
@@ -21,8 +21,7 @@ var timeScale = d3.scale.linear()
 var svg = d3.select('body')
             .append('svg')
             .attr('width', params.width)
-            .attr('height', params.width + 100);
-
+            .attr('height', params.width + 60);
 
 //Background
 svg.append('rect')
@@ -64,26 +63,17 @@ function initTimeLine(){
     svg.append('rect')
         .attr('fill', '#ffffff')
         .attr('width', params.width)
-        .attr('height', 100)
+        .attr('height', 60)
         .attr('x', 0)
         .attr('y', params.width);
     
     svg.append('line')
         .attr('x1', 20)
-        .attr('y1', params.width + 50)
+        .attr('y1', params.width + 25)
         .attr('x2', params.width - 20)
-        .attr('y2', params.width + 50)
+        .attr('y2', params.width + 25)
         .attr('stroke-width', 4) 
         .attr('stroke', '#ecf0f1');
-    
-    /*svg.append('line')
-        .attr('class', 'handleline')
-        .attr('x1', 20)
-        .attr('y1', params.width + 50)
-        .attr('x2', 20)
-        .attr('y2', params.width + 50)
-        .attr('stroke-width', 4) 
-        .attr('stroke', '#c0392b');*/
     
     svg.selectAll('.linenode')
         .data(params.timepoints)
@@ -91,7 +81,7 @@ function initTimeLine(){
         .attr('class', 'linenode')
         .attr('r', function(t){ return scale(t.d/2); })
         .attr('cx', function(t) { return lineScale(t.time); })
-        .attr('cy', params.width + 50)
+        .attr('cy', params.width + 25)
         .attr('fill', '#ecf0f1');
     
     
@@ -99,7 +89,7 @@ function initTimeLine(){
         .attr('class', 'handle')
         .attr('r', scale(params.timepoints[0].d/2))
         .attr('cx', 20)
-        .attr('cy', params.width + 50)
+        .attr('cy', params.width + 25)
         .attr('fill', '#e74c3c')
         .attr('stroke', '#cc2b19')
         .attr('stroke-width', 1);
@@ -109,7 +99,7 @@ function initTimeLine(){
         .enter().append('text')
         .attr('class', 'linelabel')
         .attr('x', function(t) { return lineScale(t.time); })
-        .attr('y', params.width + 78)
+        .attr('y', params.width + 53)
         .attr('font-size', '12')
         .attr('font-family', 'verdana')
         .attr('text-anchor', 'middle')
@@ -208,7 +198,7 @@ function formatNodes(nodes, timePoints){
 
 
 
-},{"./js/poissonDiscSamplerNodesLinks.js":2,"./params.json":5,"d3":3,"underscore":4}],2:[function(require,module,exports){
+},{"./js/algorithms/poissonDiscSamplerNodesLinks.js":2,"./params.json":5,"d3":3,"underscore":4}],2:[function(require,module,exports){
 var links, 
     nodes;
 
