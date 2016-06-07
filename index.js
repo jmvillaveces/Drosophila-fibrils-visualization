@@ -1,7 +1,7 @@
-var d3 = require('d3');
-var _ = require('underscore');
-var params = require('./params.json');
-var poisson = require('./js/poissonDiscSamplerNodesLinks.js');
+var d3 = require('d3'),
+    _ = require('underscore'),
+    params = require('./params.json'),
+    poisson = require('./js/poissonDiscSamplerNodesLinks.js');
 
 var animationStep = 400;
 
@@ -21,8 +21,6 @@ var svg = d3.select('body')
             .append('svg')
             .attr('width', params.width)
             .attr('height', params.width + 100);
-
-//t.duration
 
 
 //Background
@@ -104,6 +102,18 @@ function initTimeLine(){
         .attr('fill', '#e74c3c')
         .attr('stroke', '#cc2b19')
         .attr('stroke-width', 1);
+    
+    svg.selectAll('.linelabel')
+        .data(params.timepoints)
+        .enter().append('text')
+        .attr('class', 'linelabel')
+        .attr('x', function(t) { return lineScale(t.time); })
+        .attr('y', params.width + 78)
+        .attr('font-size', '12')
+        .attr('font-family', 'verdana')
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#2c3e50')
+        .text(function(d){return d.name});
 }
 
 function simulate(e){
