@@ -1,8 +1,8 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var d3 = require('d3');
-var _ = require('underscore');
-var params = require('./params.json');
-var poisson = require('./js/poissonDiscSamplerNodesLinks.js');
+var d3 = require('d3'),
+    _ = require('underscore'),
+    params = require('./params.json'),
+    poisson = require('./js/poissonDiscSamplerNodesLinks.js');
 
 var animationStep = 400;
 
@@ -22,8 +22,6 @@ var svg = d3.select('body')
             .append('svg')
             .attr('width', params.width)
             .attr('height', params.width + 100);
-
-//t.duration
 
 
 //Background
@@ -105,6 +103,18 @@ function initTimeLine(){
         .attr('fill', '#e74c3c')
         .attr('stroke', '#cc2b19')
         .attr('stroke-width', 1);
+    
+    svg.selectAll('.linelabel')
+        .data(params.timepoints)
+        .enter().append('text')
+        .attr('class', 'linelabel')
+        .attr('x', function(t) { return lineScale(t.time); })
+        .attr('y', params.width + 78)
+        .attr('font-size', '12')
+        .attr('font-family', 'verdana')
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#2c3e50')
+        .text(function(d){return d.name});
 }
 
 function simulate(e){
@@ -11420,43 +11430,43 @@ module.exports={
     "timepoints":[
         
         {
-            "name" : "30h_full_avg",
+            "name" : "30h",
             "d": 0.414956522,
             "dev": 0.02957345,
             "time": 30
         },
         {
-            "name" : "48h_full_avg",
+            "name" : "48h",
             "d": 0.460236842,
             "dev": 0.023685363,
             "time": 48
         },
         {
-            "name" : "60h_full_avg",
+            "name" : "60h",
             "d": 0.577925926,
             "dev": 0.065053189,
             "time": 60
         },
         {
-            "name" : "72h_full_avg",
+            "name" : "72h",
             "d": 0.936512821,
             "dev": 0.08255361,
             "time": 72
         },
         {
-            "name" : "80h_full_avg",
+            "name" : "80h",
             "d": 0.99496875,
             "dev": 0.073868446,
             "time": 80
         },
         {
-            "name" : "90h_full_avg",
+            "name" : "90h",
             "d": 1.051636364,
             "dev": 0.074312608,
             "time": 90
         },
         {
-            "name" : "1d_full_avg",
+            "name" : "114h",
             "d": 1.433435897,
             "dev": 0.095675107,
             "time": 114
