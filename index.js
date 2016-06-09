@@ -3,8 +3,6 @@ var d3 = require('d3'),
     params = require('./params.json'),
     poisson = require('./js/algorithms/poissonDiscSamplerNodesLinks.js');
 
-var animationStep = 400;
-
 var x = d3.scale.linear()
     .domain([0, params.width])
     .range([-params.width/2, params.width/2]);
@@ -14,8 +12,12 @@ var scale = d3.scale.linear()
     .range([0, params.width]);
 
 var timeScale = d3.scale.linear()
-    .domain([ 0, d3.sum(params.timepoints, function(d){ return d.time; }) ])
+    .domain([params.timepoints[0].time, params.timepoints[params.timepoints.length -1 ].time])
     .range([ 0, params.transition ]);
+
+var lineScale = d3.scale.linear()
+    .domain([params.timepoints[0].time, params.timepoints[params.timepoints.length -1 ].time])
+    .range([20, params.width - 20]);
 
 var svg = d3.select('body')
             .append('svg')
@@ -48,10 +50,6 @@ var nodes = svg.selectAll('.node')
         .attr('stroke-width', 1);
 
 formatNodes(data.nodes, params.timepoints);
-
-var lineScale = d3.scale.linear()
-    .domain([params.timepoints[0].time, params.timepoints[params.timepoints.length -1 ].time])
-    .range([20, params.width - 20]);
 
 initTimeLine();
 animate();
@@ -132,27 +130,20 @@ function runLayout(d, steps, callback){
     callback();
 }
 
-function stepForce(){
-    
-    nodes.transition().ease('linear').duration(animationStep)
-            .attr('cx', function(d) { return d.x; })
-            .attr('cy', function(d) { return d.y; })
-            .attr('r', scale(params.timepoints[1].d/2));
-}
-
 function animate(){
-
-    var tr = svg.transition();
     
-    for(var i = 1; i < params.timepoints.length; i++){
+    function animationStep(i){
+    
+        var tp = params.timepoints[i];
         
-        var tp = params.timepoints[i],
+        if(_.isUndefined(tp)) return;
+        
+        var tr = svg.transition(),
             r = scale(tp.d/2),
             linePos = lineScale(tp.time);
-        
-        tr            
+
+         tr            
             .duration(tp.duration)
-            .delay(tp.delay)
             .ease('linear')
             .selectAll('.node')
                 .attr('cx', function(d) { return d.positions[i][0]; })
@@ -161,12 +152,14 @@ function animate(){
         
         tr
             .duration(tp.duration)
-            .delay(tp.delay)
             .ease('linear')
             .selectAll('.handle')
             .attr('cx', linePos)
-            .attr('r', r);
+            .attr('r', r)
+            .each('end', function(){ i++; animationStep(i); });
     }
+    
+    animationStep(1);
 }
 
 function formatNodes(nodes, timePoints){
@@ -177,20 +170,20 @@ function formatNodes(nodes, timePoints){
     
     var delay = 0;
     
-    _.chain(timePoints).filter(function(t, i){
-        return i !== 0;
-    }).each(function(t){
-        runLayout(t.d, 300, addPositions);
+    _.chain(timePoints)
+        .filter(function(t, i){
+            return i !== 0;
+        })
+        .each(function(t){
+            runLayout(t.d, 300, addPositions);
         
-        t.duration = timeScale(t.time);
-        t.delay = delay;
-        
-        delay = t.duration;
-    });
+            t.duration = timeScale(t.time) - delay;
+            delay =  timeScale(t.time);
+        });
     
     function addPositions(){
         _.each(nodes, function(n){
-            n.positions.push([n.x,n.y]);
+            n.positions.push([n.x ,n.y]);
         });
     }
 }
