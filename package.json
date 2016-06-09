@@ -19,7 +19,11 @@
   "devDependencies": {
     "d3": "^3.5.17",
     "grunt": "^1.0.1",
+    "grunt-browserify": "^5.0.0",
     "grunt-cli": "^1.2.0",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-contrib-uglify": "^1.0.1",
+    "grunt-http-server": "^2.0.0",
     "json2csv": "^3.4.2",
     "underscore": "^1.8.3"
   }
