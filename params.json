@@ -1,8 +1,8 @@
 {
     "width": 500,
     "window": 28.33974241,
-    "eDistance": 36,
-    "transition": 200000,
+    "eDistance": 25,
+    "transition": 20000,
     "timepoints":[
         
         {
