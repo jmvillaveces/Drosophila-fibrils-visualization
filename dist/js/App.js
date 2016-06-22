@@ -32,6 +32,7 @@ svg.append('rect')
     .attr('height', params.width);
 
 var data = poisson(params.width, params.width, params.eDistance);
+console.log('showing ' + data.nodes.length + ' nodes');
     
 var force = d3.layout.force()
         .gravity(0)
@@ -53,7 +54,33 @@ var nodes = svg.selectAll('.node')
 formatNodes(data.nodes, params.timepoints);
 
 initTimeLine();
+showScale(5, 'µm');
 animate();
+
+function showScale(w, units){
+
+    var width = scale(w),
+        top = 30,
+        right = params.width - width - 30;
+    
+    svg.append('line')
+        .attr('x1', right)
+        .attr('y1', top)
+        .attr('x2', width + right)
+        .attr('y2', top)
+        .attr('stroke-width', 4) 
+        .attr('stroke', '#000');
+    
+    svg.append('text')
+        .attr('x', width/2 + right)
+        .attr('y', top + 20)
+        .attr('font-size', '15')
+        .attr('font-family', 'verdana')
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#000')
+        .text( w + units);
+
+}
 
 function initTimeLine(){
     
@@ -171,18 +198,20 @@ function formatNodes(nodes, timePoints){
     
     var delay = 0;
     
-    _.chain(timePoints).filter(function(t, i){
-        return i !== 0;
-    }).each(function(t){
-        runLayout(t.d, 300, addPositions);
+    _.chain(timePoints)
+        .filter(function(t, i){
+            return i !== 0;
+        })
+        .each(function(t){
+            runLayout(t.d, 300, addPositions);
         
-        t.duration = timeScale(t.time) - delay;
-        delay =  timeScale(t.time);
-    });
+            t.duration = timeScale(t.time) - delay;
+            delay =  timeScale(t.time);
+        });
     
     function addPositions(){
         _.each(nodes, function(n){
-            n.positions.push([n.x,n.y]);
+            n.positions.push([n.x ,n.y]);
         });
     }
 }
@@ -11406,7 +11435,7 @@ module.exports = init;
 module.exports={
     "width": 500,
     "window": 28.33974241,
-    "eDistance": 25,
+    "eDistance": 20,
     "transition": 20000,
     "timepoints":[
         
