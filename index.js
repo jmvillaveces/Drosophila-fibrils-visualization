@@ -31,6 +31,7 @@ svg.append('rect')
     .attr('height', params.width);
 
 var data = poisson(params.width, params.width, params.eDistance);
+console.log('showing ' + data.nodes.length + ' nodes');
     
 var force = d3.layout.force()
         .gravity(0)
@@ -52,7 +53,33 @@ var nodes = svg.selectAll('.node')
 formatNodes(data.nodes, params.timepoints);
 
 initTimeLine();
+showScale(5, 'µm');
 animate();
+
+function showScale(w, units){
+
+    var width = scale(w),
+        top = 30,
+        right = params.width - width - 30;
+    
+    svg.append('line')
+        .attr('x1', right)
+        .attr('y1', top)
+        .attr('x2', width + right)
+        .attr('y2', top)
+        .attr('stroke-width', 4) 
+        .attr('stroke', '#000');
+    
+    svg.append('text')
+        .attr('x', width/2 + right)
+        .attr('y', top + 20)
+        .attr('font-size', '15')
+        .attr('font-family', 'verdana')
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#000')
+        .text( w + units);
+
+}
 
 function initTimeLine(){
     

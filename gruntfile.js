@@ -25,7 +25,18 @@ module.exports = function(grunt) {
                 }
             }
         },
-        
+        exec: {
+            record: {
+                cmd: function(duration, framerate, output){
+                    
+                    duration = (duration === undefined) ? 15 : duration;
+                    framerate = (framerate === undefined) ? 30 : framerate;
+                    output = (output === undefined) ? './scripts/output.mp4' : output;
+                    
+                    return 'phantomjs ./scripts/runner.js ' + duration + ' ' + framerate + '| ffmpeg -y -c:v png -f image2pipe -r ' + framerate + ' -t ' + duration + '  -i - -c:v libx264 -pix_fmt yuv420p -preset slow -crf 22 ' + output;
+                }
+            }
+        },
         'http-server': {
  
             'dev': {
@@ -60,6 +71,7 @@ module.exports = function(grunt) {
     //Generates dist folder
     
     // Load the plugins
+    grunt.loadNpmTasks('grunt-exec');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-http-server');
