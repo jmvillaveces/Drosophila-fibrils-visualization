@@ -78,7 +78,6 @@ function showScale(w, units){
         .attr('text-anchor', 'middle')
         .attr('fill', '#000')
         .text( w + units);
-
 }
 
 function initTimeLine(){
